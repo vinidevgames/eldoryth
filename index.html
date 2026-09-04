@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eldoryth - Knight's Path</title>
+    <!-- Importando fonte pixelada do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Press Start 2P', monospace;
+            image-rendering: pixelated;
+        }
+        /* Fundo responsivo automático */
+        .bg-custom {
+            background-image: url('bkg_mobile.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        @media (min-width: 768px) {
+            .bg-custom {
+                background-image: url('bkg_pc.png');
+            }
+        }
+        /* Estilo de pixel border personalizado */
+        .pixel-box {
+            box-shadow: 4px 4px 0px 0px #000000, 
+                        8px 8px 0px 0px #450a0a;
+            border: 4px solid #facc15;
+        }
+        .pixel-btn {
+            box-shadow: 3px 3px 0px 0px #000;
+            transition: transform 0.1s ease;
+        }
+        .pixel-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #000;
+        }
+        @keyframes pulseAlert {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .pulse-notification {
+            animation: pulseAlert 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="bg-custom min-h-screen text-amber-300 flex flex-col justify-between p-4 md:p-8">
+
+    <!-- CABEÇALHO / LOGO -->
+    <header class="w-full max-w-4xl mx-auto text-center my-6 flex flex-col items-center">
+        <h1 class="text-2xl md:text-4xl text-red-600 drop-shadow-[4px_4px_0px_#facc15] mb-2 uppercase tracking-wider">
+            Eldoryth
+        </h1>
+        <p class="text-xs md:text-sm text-amber-200 tracking-widest mb-4">KNIGHT'S PATH - OFFICIAL SITE</p>
+
+        <!-- BOTÃO COM ÍCONE DO DISCORD NO CABEÇALHO -->
+        <a href="https://discord.gg/jvWQnxXTu" target="_blank" class="pixel-btn inline-flex items-center gap-2 bg-[#5865F2] hover:bg-[#4752C4] text-white border-2 border-white px-4 py-2 text-[10px] uppercase font-bold tracking-wider">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 127.14 96.36">
+                <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0,3.36,6.83A97.68,97.68,0,0,0,42.26,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a74.52,74.52,0,0,0,64.3,0c.87.68,1.76,1.36,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-18.88-72.15ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74c6.51,0,11.6,5.78,11.44,12.74C53.89,60,48.81,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74c6.45,0,11.55,5.78,11.43,12.74C96.12,60,91.08,65.69,84.69,65.69Z"/>
+            </svg>
+            Entrar no Discord 💬
+        </a>
+    </header>
+
+    <!-- BANNER DE NOTIFICAÇÃO DE RESPOSTA DA EQUIPE -->
+    <div id="reply-notification-banner" class="hidden max-w-3xl mx-auto w-full mb-6 bg-amber-500 text-black p-4 pixel-box border-white text-center pulse-notification cursor-pointer" onclick="switchTab('reviews')">
+        <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider">
+            🔔 A Equipe respondeu à sua Avaliação! Clique aqui para ver.
+        </p>
+    </div>
+
+    <!-- NAVEGAÇÃO / ABAS -->
+    <nav class="flex justify-center gap-2 md:gap-4 mb-6">
+        <button onclick="switchTab('apks')" id="btn-apks" class="pixel-btn bg-red-900 text-amber-300 border-2 border-amber-400 px-3 py-2 md:px-6 md:py-3 text-[10px] md:text-xs uppercase font-bold">
+            ⚔️ APKs
+        </button>
+        <button onclick="switchTab('changelogs')" id="btn-changelogs" class="pixel-btn bg-stone-900 text-stone-400 border-2 border-stone-600 px-3 py-2 md:px-6 md:py-3 text-[10px] md:text-xs uppercase font-bold">
+            📜 Changelogs
+        </button>
+        <button onclick="switchTab('reviews')" id="btn-reviews" class="pixel-btn bg-stone-900 text-stone-400 border-2 border-stone-600 px-3 py-2 md:px-6 md:py-3 text-[10px] md:text-xs uppercase font-bold relative">
+            💬 Reviews
+            <span id="reviews-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-[8px] px-1.5 py-0.5 rounded-full border border-amber-300">!</span>
+        </button>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="w-full max-w-3xl mx-auto flex-grow mb-12">
+
+        <!-- ABA APKs -->
+        <div id="tab-apks" class="space-y-6">
+            <div class="bg-black/80 p-4 md:p-6 pixel-box border-amber-400">
+                <h2 class="text-sm md:text-base text-amber-400 mb-4 border-b-2 border-amber-400/50 pb-2">VERSÕES DISPONÍVEIS</h2>
+                
+                <div id="apks-list" class="space-y-4">
+                    <!-- Alpha 0.1 (Fixo) -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between bg-stone-900/90 p-3 md:p-4 border-2 border-red-900 gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="apk_logo.png" alt="Logo APK" class="w-12 h-12 pixelated border-2 border-amber-400" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 24 24\' fill=\'%23facc15\'><path d=\'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\'/></svg>'">
+                            <div>
+                                <h3 class="text-xs md:text-sm text-amber-300">Eldoryth Alpha v0.1</h3>
+                                <p class="text-[9px] text-stone-400 mt-1">Primeira build pública de testes.</p>
+                            </div>
+                        </div>
+                        <a href="https://www.mediafire.com/file/de37m9p9875gl9y/Eldoryth_Alpha_v0.1.apk/file" target="_blank" class="pixel-btn bg-red-700 hover:bg-red-600 text-white text-[10px] px-4 py-2 border border-amber-400 text-center">
+                            BAIXAR
+                        </a>
+                    </div>
+
+                    <!-- Alpha 0.2 (Fixo) -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between bg-stone-900/90 p-3 md:p-4 border-2 border-red-900 gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="apk_logo.png" alt="Logo APK" class="w-12 h-12 pixelated border-2 border-amber-400" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 24 24\' fill=\'%23facc15\'><path d=\'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\'/></svg>'">
+                            <div>
+                                <h3 class="text-xs md:text-sm text-amber-300">Eldoryth Alpha v0.2</h3>
+                                <p class="text-[9px] text-stone-400 mt-1">Correções de bugs e melhorias.</p>
+                            </div>
+                        </div>
+                        <a href="https://www.mediafire.com/file/p9ki1dsa0a5xthi/Eldoryth_Alpha_v0.2.apk/file" target="_blank" class="pixel-btn bg-red-700 hover:bg-red-600 text-white text-[10px] px-4 py-2 border border-amber-400 text-center">
+                            BAIXAR
+                        </a>
+                    </div>
+
+                    <!-- Beta (Fixo) -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between bg-stone-900/90 p-3 md:p-4 border-2 border-amber-500 gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="apk_logo.png" alt="Logo APK" class="w-12 h-12 pixelated border-2 border-amber-400" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 24 24\' fill=\'%23facc15\'><path d=\'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\'/></svg>'">
+                            <div>
+                                <h3 class="text-xs md:text-sm text-amber-400 font-bold">Eldoryth Beta <span class="text-red-500 text-[8px] bg-red-950 px-1 border border-red-500">RECENTE</span></h3>
+                                <p class="text-[9px] text-stone-300 mt-1">Versão mais atual e polida do jogo.</p>
+                            </div>
+                        </div>
+                        <a href="https://www.mediafire.com/file/446tt3u6xrelzn1/Eldoryth_Beta.apk/file" target="_blank" class="pixel-btn bg-amber-500 hover:bg-amber-400 text-black font-bold text-[10px] px-4 py-2 border border-white text-center">
+                            BAIXAR
+                        </a>
+                    </div>
+
+                    <!-- CONTAINER PARA APKs DINÂMICOS PUBLICADOS NO PAINEL ADMIN -->
+                    <div id="dynamic-apks" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA CHANGELOGS -->
+        <div id="tab-changelogs" class="hidden space-y-6">
+            <div class="bg-black/80 p-4 md:p-6 pixel-box border-stone-600 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-stone-700 pb-3">
+                    <h2 class="text-sm md:text-base text-stone-300">CHANGELOGS DAS VERSÕES</h2>
+                    <div class="flex items-center gap-2">
+                        <label class="text-[9px] text-stone-400 uppercase font-mono">Versão:</label>
+                        <select id="changelog-version-select" onchange="renderSelectedChangelog()" class="bg-stone-900 border-2 border-stone-600 text-[10px] text-amber-300 p-2 outline-none cursor-pointer">
+                            <option value="">Selecione uma versão...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CONTEÚDO DA CHANGELOG -->
+                <div id="changelog-content-area" class="p-4 bg-stone-900/90 border-2 border-stone-800 min-h-[180px] font-sans text-xs text-stone-300 leading-relaxed">
+                    <p class="text-stone-500 font-mono text-[10px] text-center py-12">Selecione uma versão acima para ler as notas de atualização.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA REVIEWS / TICKETS -->
+        <div id="tab-reviews" class="hidden space-y-6">
+            
+            <!-- CARD DE CONVITE DO DISCORD -->
+            <div class="bg-[#5865F2]/20 p-4 pixel-box border-[#5865F2] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="space-y-2 text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-2 text-white font-bold text-xs">
+                        <svg class="w-5 h-5 fill-current text-[#5865F2]" viewBox="0 0 127.14 96.36">
+                            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0,3.36,6.83A97.68,97.68,0,0,0,42.26,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a74.52,74.52,0,0,0,64.3,0c.87.68,1.76,1.36,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-18.88-72.15ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74c6.51,0,11.6,5.78,11.44,12.74C53.89,60,48.81,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74c6.45,0,11.55,5.78,11.43,12.74C96.12,60,91.08,65.69,84.69,65.69Z"/>
+                        </svg>
+                        <span>COMUNIDADE NO DISCORD</span>
+                    </div>
+                    <p class="text-[9px] text-stone-200 leading-relaxed font-sans">
+                        Quer spoilers das próximas atualizações e respostas mais rápidas? Entre no nosso servidor e acesse o canal de <strong>#Sugestões</strong>!
+                    </p>
+                </div>
+                <a href="https://discord.gg/jvWQnxXTu" target="_blank" class="pixel-btn bg-[#5865F2] hover:bg-[#4752C4] text-white text-[9px] px-4 py-2.5 border border-white font-bold whitespace-nowrap">
+                    ENTRAR AGORA 🚀
+                </a>
+            </div>
+
+            <div class="bg-black/80 p-6 pixel-box border-amber-400">
+                <h2 class="text-sm md:text-base text-amber-400 mb-2">ENVIAR TICKET / REVIEW</h2>
+                <p class="text-[9px] text-stone-400 mb-4">Mande sua avaliação, crítica ou sugestão diretamente para o painel da equipe.</p>
+                
+                <form id="ticket-form" onsubmit="submitTicket(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] text-amber-300 mb-1">SEU NOME / NICK</label>
+                        <input type="text" id="ticket-name" required class="w-full bg-stone-900 border-2 border-stone-600 p-2 text-xs text-white focus:border-amber-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-amber-300 mb-1">MENSAGEM / FEEDBACK</label>
+                        <textarea id="ticket-msg" rows="3" required class="w-full bg-stone-900 border-2 border-stone-600 p-2 text-xs text-white focus:border-amber-400 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-amber-300 mb-1">ANEXAR IMAGEM (OPCIONAL - COMPACTADA)</label>
+                        <input type="file" id="ticket-img" accept="image/*" class="w-full text-[9px] text-stone-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-[9px] file:font-semibold file:bg-red-900 file:text-amber-300 hover:file:bg-red-800 cursor-pointer">
+                    </div>
+                    <button type="submit" id="submit-btn" class="pixel-btn w-full bg-red-800 hover:bg-red-700 text-amber-300 border-2 border-amber-400 py-3 text-xs uppercase font-bold">
+                        ENVIAR TICKET 📨
+                    </button>
+                </form>
+                <div id="ticket-feedback" class="hidden mt-4 p-3 bg-stone-900 border border-green-500 text-[9px] text-green-400 text-center">
+                    Ticket enviado com sucesso para o banco de dados! 🛡️
+                </div>
+            </div>
+
+            <!-- MEUS TICKETS ENVIADOS -->
+            <div class="bg-black/80 p-6 pixel-box border-stone-600 mt-6">
+                <h3 class="text-xs text-amber-400 mb-4 border-b border-stone-700 pb-2 flex items-center justify-between">
+                    <span>SEUS TICKETS ENVIADOS</span>
+                    <button onclick="window.loadMyTickets()" class="text-[9px] text-stone-400 hover:text-amber-300 uppercase">🔄 Atualizar</button>
+                </h3>
+                <div id="my-tickets-list" class="space-y-4 text-[9px]">
+                    <p class="text-stone-500">Nenhum ticket encontrado neste dispositivo.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="text-center text-[8px] text-stone-500 tracking-wider space-y-2">
+        <div class="flex justify-center items-center gap-2">
+            <a href="https://discord.gg/jvWQnxXTu" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-bold">DISCORD OFICIAL</a>
+        </div>
+        <div>VD GAMES™ 2026 - ALL RIGHTS RESERVED</div>
+    </footer>
+
+    <!-- SCRIPT DE MANIPULAÇÃO DE ABAS (GLOBAL) -->
+    <script>
+        function switchTab(tabName) {
+            document.getElementById('tab-apks').classList.add('hidden');
+            document.getElementById('tab-changelogs').classList.add('hidden');
+            document.getElementById('tab-reviews').classList.add('hidden');
+
+            const inactiveBtnClass = "pixel-btn bg-stone-900 text-stone-400 border-2 border-stone-600 px-3 py-2 md:px-6 md:py-3 text-[10px] md:text-xs uppercase font-bold relative";
+            const activeBtnClass = "pixel-btn bg-red-900 text-amber-300 border-2 border-amber-400 px-3 py-2 md:px-6 md:py-3 text-[10px] md:text-xs uppercase font-bold relative";
+
+            document.getElementById('btn-apks').className = inactiveBtnClass;
+            document.getElementById('btn-changelogs').className = inactiveBtnClass;
+            document.getElementById('btn-reviews').className = inactiveBtnClass;
+
+            if (tabName === 'apks') {
+                document.getElementById('tab-apks').classList.remove('hidden');
+                document.getElementById('btn-apks').className = activeBtnClass;
+            } else if (tabName === 'changelogs') {
+                document.getElementById('tab-changelogs').classList.remove('hidden');
+                document.getElementById('btn-changelogs').className = activeBtnClass;
+                if (typeof window.loadChangelogsData === 'function') {
+                    window.loadChangelogsData();
+                }
+            } else if (tabName === 'reviews') {
+                document.getElementById('tab-reviews').classList.remove('hidden');
+                document.getElementById('btn-reviews').className = activeBtnClass;
+                const banner = document.getElementById('reply-notification-banner');
+                if (banner) banner.classList.add('hidden');
+                
+                if (typeof window.loadMyTickets === 'function') {
+                    window.loadMyTickets();
+                }
+            }
+        }
+    </script>
+
+    <!-- FIREBASE E SCRIPT DE DADOS + CHANGELOGS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0OcpougpG2EmvGKIWiezfK8w1pNlP6j4",
+            authDomain: "vinidevgames.firebaseapp.com",
+            projectId: "vinidevgames",
+            storageBucket: "vinidevgames.firebasestorage.app",
+            messagingSenderId: "7213736490",
+            appId: "1:7213736490:web:c8b73fd6eec5b15e049953",
+            measurementId: "G-Z5L8NLX2CS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        signInAnonymously(auth).catch((err) => console.log("Auth Anônima:", err.message));
+
+        let deviceId = localStorage.getItem('eldoryth_device_id');
+        if (!deviceId) {
+            deviceId = 'user_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('eldoryth_device_id', deviceId);
+        }
+
+        // LISTA DE VERSÕES ESTÁTICAS + DINÂMICAS PARA CHANGELOGS
+        let cachedVersions = [
+            { id: "v0.1", title: "Eldoryth Alpha v0.1", description: "Primeira build pública de testes." },
+            { id: "v0.2", title: "Eldoryth Alpha v0.2", description: "Correções de bugs e melhorias." },
+            { id: "v_beta", title: "Eldoryth Beta", description: "Versão mais atual e polida do jogo." }
+        ];
+
+        async function loadDynamicApks() {
+            const container = document.getElementById('dynamic-apks');
+            if (!container) return;
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "apks"));
+                if (querySnapshot.empty) return;
+
+                container.innerHTML = '';
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const iconSrc = data.icon || 'apk_logo.png';
+                    const tagBadge = data.tag ? `<span class="text-red-500 text-[8px] bg-red-950 px-1 border border-red-500 ml-1 uppercase">${data.tag}</span>` : '';
+
+                    // Adiciona na cache de versões para o changelog
+                    cachedVersions.push({
+                        id: docSnap.id,
+                        title: data.title,
+                        description: data.description,
+                        changelog: data.changelog || null
+                    });
+
+                    const apkCard = `
+                        <div class="flex flex-col sm:flex-row items-center justify-between bg-stone-900/90 p-3 md:p-4 border-2 border-amber-500 gap-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${iconSrc}" alt="Logo APK" class="w-12 h-12 pixelated border-2 border-amber-400" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 24 24\' fill=\'%23facc15\'><path d=\'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\'/></svg>'">
+                                <div>
+                                    <h3 class="text-xs md:text-sm text-amber-400 font-bold">${data.title} ${tagBadge}</h3>
+                                    <p class="text-[9px] text-stone-300 mt-1">${data.description}</p>
+                                </div>
+                            </div>
+                            <a href="${data.downloadUrl}" target="_blank" class="pixel-btn bg-amber-500 hover:bg-amber-400 text-black font-bold text-[10px] px-4 py-2 border border-white text-center">
+                                BAIXAR
+                            </a>
+                        </div>
+                    `;
+                    container.innerHTML += apkCard;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar APKs dinâmicos:", error);
+            }
+        }
+
+        // CARREGA OS DADOS DA ABA CHANGELOGS
+        window.loadChangelogsData = async function() {
+            const select = document.getElementById('changelog-version-select');
+            if (!select) return;
+
+            // Mantém a opção padrão e recarrega do cache atualizado
+            select.innerHTML = `<option value="">Selecione uma versão...</option>`;
+
+            try {
+                // Garante que busca os APKs mais recentes do banco também
+                const querySnapshot = await getDocs(collection(db, "apks"));
+                let allVersions = [...cachedVersions];
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    // Evita duplicatas se já estiver na cache
+                    if (!allVersions.some(v => v.id === docSnap.id)) {
+                        allVersions.push({
+                            id: docSnap.id,
+                            title: data.title,
+                            description: data.description,
+                            changelog: data.changelog || null
+                        });
+                    }
+                });
+
+                allVersions.forEach((ver) => {
+                    const opt = document.createElement('option');
+                    opt.value = ver.id;
+                    opt.textContent = ver.title;
+                    select.appendChild(opt);
+                });
+
+                window.currentVersionsList = allVersions;
+            } catch (err) {
+                console.error("Erro ao carregar versões para changelogs:", err);
+            }
+        };
+
+        window.renderSelectedChangelog = function() {
+            const select = document.getElementById('changelog-version-select');
+            const area = document.getElementById('changelog-content-area');
+            if (!select || !area) return;
+
+            const selectedId = select.value;
+            if (!selectedId) {
+                area.innerHTML = `<p class="text-stone-500 font-mono text-[10px] text-center py-12">Selecione uma versão acima para ler as notas de atualização.</p>`;
+                return;
+            }
+
+            const versions = window.currentVersionsList || cachedVersions;
+            const verData = versions.find(v => v.id === selectedId);
+
+            if (!verData) {
+                area.innerHTML = `<p class="text-rose-500 font-mono text-[10px] text-center py-12">Versão não encontrada.</p>`;
+                return;
+            }
+
+            if (verData.changelog && verData.changelog.trim() !== "") {
+                // Exibe as changelogs cadastradas pelo dono
+                area.innerHTML = `
+                    <div class="space-y-3">
+                        <h3 class="text-amber-400 font-bold text-xs uppercase border-b border-stone-700 pb-2">Notas de Atualização: ${verData.title}</h3>
+                        <div class="text-stone-200 text-xs leading-relaxed whitespace-pre-wrap">${verData.changelog}</div>
+                    </div>
+                `;
+            } else {
+                // Fallback: Se não tiver changelog cadastrada, exibe a descrição padrão
+                area.innerHTML = `
+                    <div class="space-y-3 text-center py-4">
+                        <h3 class="text-amber-300 font-bold text-xs uppercase">${verData.title}</h3>
+                        <p class="text-stone-300 text-xs max-w-lg mx-auto leading-relaxed">${verData.description}</p>
+                        <div class="inline-block mt-4 p-3 bg-stone-950 border border-amber-500/30 text-amber-400 font-mono text-[9px]">
+                            ⚠️ O dono ainda não colocou as Changelogs detalhadas para esta versão.
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        // Compressão de imagem leve
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 400;
+                        const MAX_HEIGHT = 400;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    }
+                }
+            });
+        }
+
+        // Submeter novo ticket
+        window.submitTicket = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('ticket-name').value;
+            const msg = document.getElementById('ticket-msg').value;
+            const imageFile = document.getElementById('ticket-img').files[0];
+            const btn = document.getElementById('submit-btn');
+
+            btn.disabled = true;
+            btn.innerText = "ENVIANDO...";
+
+            try {
+                const compressedImage = await compressImage(imageFile);
+
+                const initialHistory = [{
+                    sender: name || 'Jogador',
+                    role: 'USER',
+                    text: msg,
+                    timestamp: new Date().toISOString()
+                }];
+
+                await addDoc(collection(db, "reviews"), {
+                    name: name,
+                    message: msg,
+                    messagesHistory: initialHistory,
+                    image: compressedImage || null,
+                    deviceId: deviceId,
+                    status: "Pendente",
+                    adminReply: null,
+                    userReply: null,
+                    createdAt: serverTimestamp()
+                });
+
+                document.getElementById('ticket-form').reset();
+                const feedback = document.getElementById('ticket-feedback');
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 4000);
+
+                window.loadMyTickets();
+            } catch (error) {
+                console.error("Erro ao enviar ticket: ", error);
+                alert("Erro ao enviar ticket. Verifique sua conexão.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "ENVIAR TICKET 📨";
+            }
+        };
+
+        window.submitUserReply = async function(ticketId, existingMessages, playerName) {
+            const input = document.getElementById(`user-reply-input-${ticketId}`);
+            if (!input || !input.value.trim()) return;
+
+            const newMsg = input.value.trim();
+            const btn = document.getElementById(`btn-user-reply-${ticketId}`);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "ENVIANDO...";
+            }
+
+            try {
+                const docRef = doc(db, "reviews", ticketId);
+                const history = Array.isArray(existingMessages) ? [...existingMessages] : [];
+                
+                history.push({
+                    sender: playerName || 'Jogador',
+                    role: 'USER',
+                    text: newMsg,
+                    timestamp: new Date().toISOString()
+                });
+
+                await updateDoc(docRef, {
+                    messagesHistory: history,
+                    userReply: newMsg,
+                    status: "Pendente"
+                });
+
+                window.loadMyTickets();
+            } catch (error) {
+                console.error("Erro ao enviar réplica:", error);
+                alert("Erro ao enviar resposta. Tente novamente.");
+            }
+        };
+
+        window.loadMyTickets = async function() {
+            const container = document.getElementById('my-tickets-list');
+            const badge = document.getElementById('reviews-badge');
+            const banner = document.getElementById('reply-notification-banner');
+
+            if (!container) return;
+            container.innerHTML = `<p class="text-stone-400">Carregando seus tickets...</p>`;
+
+            try {
+                const q = query(collection(db, "reviews"), where("deviceId", "==", deviceId));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = `<p class="text-stone-500">Nenhum ticket encontrado neste dispositivo.</p>`;
+                    if (badge) badge.classList.add('hidden');
+                    if (banner) banner.classList.add('hidden');
+                    return;
+                }
+
+                container.innerHTML = '';
+                let hasUnreadAdminReply = false;
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const ticketId = docSnap.id;
+
+                    if ((data.adminReply || data.messagesHistory) && data.status === "Respondido") {
+                        hasUnreadAdminReply = true;
+                    }
+
+                    let statusColor = "text-amber-400 border-amber-700 bg-amber-950";
+                    if (data.status === "Respondido") statusColor = "text-emerald-400 border-emerald-700 bg-emerald-950";
+                    if (data.status === "Fechado") statusColor = "text-stone-400 border-stone-700 bg-stone-900";
+
+                    let html = `
+                        <div class="bg-stone-900 p-4 border-2 border-stone-700 space-y-3">
+                            <div class="flex justify-between items-center text-amber-300 font-bold border-b border-stone-800 pb-2">
+                                <span>👤 ${data.name || 'Jogador'}</span>
+                                <span class="px-2 py-0.5 border text-[8px] uppercase ${statusColor}">${data.status}</span>
+                            </div>
+                    `;
+
+                    let history = data.messagesHistory || [];
+                    if (history.length === 0) {
+                        history.push({
+                            sender: data.name || 'Jogador',
+                            role: 'USER',
+                            text: data.message
+                        });
+                        if (data.adminReply) {
+                            history.push({
+                                sender: data.adminReplyAuthor || 'Dono',
+                                role: data.adminReplyRole || 'OWNER',
+                                text: data.adminReply
+                            });
+                        }
+                        if (data.userReply) {
+                            history.push({
+                                sender: data.name || 'Jogador',
+                                role: 'USER',
+                                text: data.userReply
+                            });
+                        }
+                    }
+
+                    html += `<div class="space-y-2.5 my-2 font-sans">`;
+                    
+                    history.forEach((msg) => {
+                        if (msg.role === 'OWNER') {
+                            html += `
+                                <div class="bg-red-950/80 border-l-4 border-amber-400 p-2.5 text-amber-100">
+                                    <span class="font-bold text-[9px] text-amber-400 block tracking-wider font-mono">👑 ${msg.sender} (DONO):</span>
+                                    <p class="text-[10px] mt-1 leading-relaxed">${msg.text}</p>
+                                </div>
+                            `;
+                        } else if (msg.role === 'DEV') {
+                            html += `
+                                <div class="bg-red-950/90 border-l-4 border-red-600 p-2.5 text-red-100">
+                                    <span class="font-bold text-[9px] text-red-400 block tracking-wider font-mono">🛠️ ${msg.sender} (DEV):</span>
+                                    <p class="text-[10px] mt-1 leading-relaxed">${msg.text}</p>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="bg-black/60 border border-stone-800 p-2.5 text-stone-200">
+                                    <span class="font-bold text-[8px] text-stone-400 block tracking-wider font-mono">💬 ${msg.sender}:</span>
+                                    <p class="text-[10px] mt-0.5 leading-relaxed">${msg.text}</p>
+                                </div>
+                            `;
+                        }
+                    });
+
+                    html += `</div>`;
+
+                    if (data.image) {
+                        html += `<div class="mt-2"><img src="${data.image}" class="max-h-28 border border-amber-400 pixelated"></div>`;
+                    }
+
+                    if (data.status !== "Fechado") {
+                        html += `
+                            <div class="mt-3 pt-3 border-t border-stone-800 space-y-2">
+                                <label class="block text-[8px] text-amber-300 uppercase font-mono">RESPONDER Á EQUIPE:</label>
+                                <textarea id="user-reply-input-${ticketId}" rows="2" placeholder="Escreva sua mensagem aqui..." class="w-full bg-black border border-stone-700 p-2 text-xs text-white focus:border-amber-400 outline-none font-sans"></textarea>
+                                <button id="btn-user-reply-${ticketId}" onclick="window.submitUserReply('${ticketId}', ${JSON.stringify(history).replace(/"/g, '&quot;')}, '${(data.name || 'Jogador').replace(/'/g, "\\'")}')" class="pixel-btn bg-amber-600 hover:bg-amber-500 text-black font-bold px-3 py-2 text-[8px] uppercase">
+                                    ENVIAR RESPOSTA ✉️
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="mt-2 p-2 bg-stone-950 border border-stone-800 text-center text-stone-500 text-[8px] uppercase font-mono">
+                                🔒 Este ticket foi encerrado pela equipe.
+                            </div>
+                        `;
+                    }
+
+                    html += `</div>`;
+                    container.innerHTML += html;
+                });
+
+                if (hasUnreadAdminReply) {
+                    if (badge) badge.classList.remove('hidden');
+                    const reviewsTab = document.getElementById('tab-reviews');
+                    if (reviewsTab && reviewsTab.classList.contains('hidden')) {
+                        if (banner) banner.classList.remove('hidden');
+                    }
+                } else {
+                    if (badge) badge.classList.add('hidden');
+                    if (banner) banner.classList.add('hidden');
+                }
+
+            } catch (error) {
+                console.error("Erro ao carregar tickets:", error);
+                container.innerHTML = `<p class="text-red-500 text-xs">Erro ao buscar seus tickets: ${error.message}</p>`;
+            }
+        };
+
+        // Inicialização
+        loadDynamicApks();
+        window.loadMyTickets();
+    </script>
+
+</body>
+</html>
