@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vinidevgames.github.io/eldoryth/sitemap.xml
